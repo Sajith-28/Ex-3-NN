@@ -36,11 +36,81 @@ Step 3: Repeat the  iteration  until the losses become constant and  minimum<BR>
 Step 4 : Test for the XOR patterns.
 
 <H3>Program:</H3>
-Insert your code here
 
+
+```
+import numpy as np
+import matplotlib.pyplot as plt
+x = np.array([[0,0,1,1],[0,1,0,1]])
+y = np.array([[0,1,1,0]])
+n_x, n_y, n_h = 2, 1, 2
+m = x.shape[1]
+lr = 0.1
+
+np.random.seed(2)
+
+x = np.array([[1, 1, 0, 0], 
+              [0, 1, 1, 0]])   
+y = np.array([[1, 0, 0, 1]])   
+
+n_x = x.shape[0]   
+n_h = 4            
+n_y = y.shape[0]   
+m = x.shape[1]     
+
+w1 = np.random.rand(n_h, n_x)
+w2 = np.random.rand(n_y, n_h)
+
+lr = 0.1
+losses = []
+
+def sigmoid(z):
+    return 1 / (1 + np.exp(-z))
+
+def forward_prop(w1, w2, x):
+    z1 = np.dot(w1, x)
+    a1 = sigmoid(z1)
+    z2 = np.dot(w2, a1)
+    a2 = sigmoid(z2)
+    return z1, a1, z2, a2
+
+def back_prop(m, w1, w2, z1, a1, z2, a2, y, x):
+    dz2 = a2 - y
+    dw2 = np.dot(dz2, a1.T) / m
+    dz1 = np.dot(w2.T, dz2) * a1 * (1 - a1)
+    dw1 = np.dot(dz1, x.T) / m
+    return dz2, dw2, dz1, dw1
+
+iterations = 10000
+for i in range(iterations):
+    z1, a1, z2, a2 = forward_prop(w1, w2, x)
+    loss = -(1/m) * np.sum(y * np.log(a2) + (1 - y) * np.log(1 - a2))
+    losses.append(loss)
+    dz2, dw2, dz1, dw1 = back_prop(m, w1, w2, z1, a1, z2, a2, y, x)
+    w2 -= lr * dw2
+    w1 -= lr * dw1
+
+plt.plot(losses)
+plt.xlabel("Epochs")
+plt.ylabel("Loss")
+plt.title("Loss vs Epochs")
+plt.show()
+
+def predict(w1, w2, input):
+    _, _, _, a2 = forward_prop(w1, w2, input)
+    result = 1 if np.squeeze(a2) >= 0.5 else 0
+    print(f"Input: {[i[0] for i in input]}  Output: {result}")
+
+predict(w1, w2, np.array([[1],[0]]))
+predict(w1, w2, np.array([[1],[1]]))
+predict(w1, w2, np.array([[0],[1]]))
+predict(w1, w2, np.array([[0],[0]]))
+```
 <H3>Output:</H3>
+<img width="830" height="579" alt="image" src="https://github.com/user-attachments/assets/fbd9df87-70be-482c-92f3-f6c583d753ea" />
 
-Show your results here
+<img width="353" height="120" alt="image" src="https://github.com/user-attachments/assets/8451c76d-931a-4745-9ad0-f30f793e560b" />
+
 
 <H3> Result:</H3>
 Thus, XOR classification problem can be solved using MLP in Python 
